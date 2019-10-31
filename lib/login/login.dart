@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import '../config/path.dart';
+import '../utils/store.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -13,10 +16,39 @@ class _LoginPageState extends State<LoginPage> {
 
   String password;
 
-  login () {
+  Future login () async {
+    Dio dio = Dio();
+    // 10.0.2.2
+    // 10.0.0.2
+    // 192.168.18.2
+    Response res = await dio.get('http://192.168.18.2:4000/login/cellphone?phone=18782922762&password=cai199062');
+    // print(res.data.toString());
+    if(res.data['code'] == 200){
+      print('登录成功');
+      storeLoginInfo('loginInfo', res.data.toString());
+    }else{
+       showDialog(
+        context: context,
+        builder: (cxt) {
+          return SimpleDialog(
+            // title: Text('xxxxx'),
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.only(left: 15,right: 15),
+                child:  Text(res.data['msg']),
+              )
+            ],
+          );
+        }
+      );
+    }
+  }
+
+  submit () {
     //校验表单
     if(loginKey.currentState.validate()) {
       loginKey.currentState.save();
+      login();
     } else {
 
     }
@@ -81,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
                       child: Text('登            录', style: TextStyle(color: Colors.white)),
                       color: Colors.redAccent,
                       onPressed: () {
-                        login();
+                        submit();
                       },
                     ),
                   ),
