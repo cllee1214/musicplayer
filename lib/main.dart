@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import './login/login.dart';
+import './home/index.dart';
 
 void main() => runApp(MyApp());
 
@@ -15,10 +14,8 @@ class MyApp extends StatelessWidget {
         // appBar: AppBar(
         //   title: Text('--'),
         // ),
-        body: LoginPage(),
+        body: HomePage(),
       )
     );
   }
 }
-
-
