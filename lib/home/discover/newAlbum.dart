@@ -1,11 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 
-class NewAlbum extends StatelessWidget {
-  const NewAlbum({Key key}) : super(key: key);
+import '../../widgets/loading.dart';
+
+class NewAlbum extends StatefulWidget {
+  NewAlbum({Key key}) : super(key: key);
+
+  _NewAlbumState createState() => _NewAlbumState();
+}
+
+class _NewAlbumState extends State<NewAlbum> {
+
+    bool hasLoad = false;
+    List newAlbumListData;
+
+    getData () async{
+    Dio dio = Dio();
+    var res = await dio.get('http://192.168.18.2:3000/top/album?offset=0&limit=6');
+    if(res.data['code'] == 200){
+       newAlbumListData = res.data['albums'];
+      setState(() {
+        hasLoad = true;
+      });
+    }else{
+      hasLoad = false;
+      print('get error...');
+    }
+  }
+
+  @override
+  void initState() { 
+    super.initState();
+    getData();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return hasLoad ? Container(
       child: Container(
         width: MediaQuery.of(context).size.width,
         child: Column(
@@ -23,24 +54,22 @@ class NewAlbum extends StatelessWidget {
                 crossAxisSpacing: 5,
                 childAspectRatio: 0.6,
                 physics: new NeverScrollableScrollPhysics(),
-                children: <Widget>[
-                  AlbumItem(),
-                  AlbumItem(),
-                  AlbumItem()
-                ],
+                children: newAlbumListData.map((album) => AlbumItem(imageUrl: album['picUrl'],name: album['name'],singger: album['artist']['name'])).toList()
               ),
             )
           ],
         ),
       ),
-    );
+    ) : Loading();
   }
 }
 
 
 class AlbumItem extends StatelessWidget {
-  const AlbumItem({Key key}) : super(key: key);
-
+  const AlbumItem({Key key, @required this.name, @required this.singger, @required this.imageUrl}) : super(key: key);
+  final String name;
+  final String singger;
+  final imageUrl;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -49,16 +78,16 @@ class AlbumItem extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(5),
                   child: Container(
-                    child:  Image.network('http://p1.music.126.net/i0qi6mibX8gq2SaLF1bYbA==/2002210674180198.jpg'),
+                    child:  Image.network(imageUrl),
                   )
                 ),
                 Container(
                   width: MediaQuery.of(context).size.width,
-                  child: Text('叶惠美', textAlign: TextAlign.left, style: TextStyle(fontSize: 12)),
+                  child: Text(name, textAlign: TextAlign.left, style: TextStyle(fontSize: 12)),
                 ),
                  Container(
                   width: MediaQuery.of(context).size.width,
-                  child: Text('周杰伦', textAlign: TextAlign.left, style: TextStyle(fontSize: 12,color: Colors.grey))
+                  child: Text(singger, textAlign: TextAlign.left, style: TextStyle(fontSize: 12,color: Colors.grey))
                 ),     
               ],
             ),
