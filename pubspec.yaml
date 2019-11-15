@@ -46,6 +46,12 @@ flutter:
   # assets:
   #  - images/a_dot_burr.jpeg
   #  - images/a_dot_ham.jpeg
+  assets:
+    - images/icon_daily.png
+    - images/icon_playlist.png
+    - images/icon_rank.png
+    - images/icon_radio.png
+    - images/icon_look.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

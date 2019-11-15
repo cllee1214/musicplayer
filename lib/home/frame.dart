@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import './discover.dart';
+import './discover/index.dart';
 class Frame extends StatefulWidget {
   Frame({Key key}) : super(key: key);
 
