@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
 import '../../widgets/loading.dart';
+import './playListDetail.dart';
 
 class RecommendList extends StatefulWidget {
   RecommendList({Key key}) : super(key: key);
@@ -19,6 +20,7 @@ class _RecommendListState extends State<RecommendList> {
     var res = await dio.get('http://192.168.18.2:3000/personalized?limit=6');
     if(res.data['code'] == 200){
        recommendListData = res.data['result'];
+      //  print(recommendListData);
       setState(() {
         hasLoad = true;
       });
@@ -43,7 +45,7 @@ class _RecommendListState extends State<RecommendList> {
                       Container(
                         width: MediaQuery.of(context).size.width,
                         color: Colors.red,
-                        child:  Text('推荐歌单',textAlign: TextAlign.left,),
+                        child:  Text('推荐歌单',textAlign: TextAlign.left),
                       ),
                       SizedBox(
                         height: 360,
@@ -54,7 +56,7 @@ class _RecommendListState extends State<RecommendList> {
                           // mainAxisSpacing: 3,
                           childAspectRatio: 0.7,
                           physics: new NeverScrollableScrollPhysics(),
-                          children: recommendListData.map((data) => PlayListItem(imageUrl: data['picUrl'], name: data['name'])).toList()
+                          children: recommendListData.map((data) => PlayListItem(imageUrl: data['picUrl'], name: data['name'], id: data['id'])).toList()
                       ),
                       )
                     ],
@@ -67,7 +69,8 @@ class _RecommendListState extends State<RecommendList> {
 class PlayListItem extends StatefulWidget {
   String imageUrl;
   String name;
-  PlayListItem({Key key, @required this.imageUrl, @required this.name}) : super(key: key);
+  int id;
+  PlayListItem({Key key, @required this.imageUrl, @required this.name, @required this.id}) : super(key: key);
 
   _PlayListItemState createState() => _PlayListItemState();
 }
@@ -82,17 +85,23 @@ class _PlayListItemState extends State<PlayListItem> {
   @override
   Widget build(BuildContext context) {
     return Container(
-            child: Column(
-              children: <Widget>[
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(5),
-                  child: Container(
-                    child:  Image.network(widget.imageUrl),
-                  )
-                ),
-                Text(widget.name,overflow: TextOverflow.ellipsis, maxLines: 2, style: TextStyle(fontSize: 12))
-              ],
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(context,  MaterialPageRoute(builder: (content) => PlayListDetail(id: widget.id)));
+                },
+                child: Column(
+                        children: <Widget>[
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(5),
+                            child: Container(
+                              child:  Image.network(widget.imageUrl),
+                            )
+                          ),
+                          Text(widget.name,overflow: TextOverflow.ellipsis, maxLines: 2, style: TextStyle(fontSize: 12))
+                        ],
+                        ) ,
             ),
+      
       );
   }
 }
