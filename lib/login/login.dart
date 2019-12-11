@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import '../config/path.dart';
+import '../config/index.dart';
 import '../utils/store.dart';
 import '../home/frame.dart';
 

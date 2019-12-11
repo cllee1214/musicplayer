@@ -3,7 +3,7 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:dio/dio.dart';
 
 import '../../widgets/loading.dart';
-
+import '../../config/index.dart';
 
 class HeadBanner extends StatefulWidget {
   HeadBanner({Key key}) : super(key: key);
@@ -24,7 +24,7 @@ class _HeadBannerState extends State<HeadBanner> {
 
   getBannerData () async{
     Dio dio = Dio();
-    var res = await dio.get('http://192.168.18.2:3000/banner?type=1');
+    var res = await dio.get(Config().resolveHost() + '/banner?type=1');
     if(res.data['code'] == 200){
        bannerData = res.data['banners'];
       setState(() {

@@ -1,8 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart' as prefix0;
-
+import 'package:audioplayers/audioplayers.dart';
+import '../../config/index.dart';
 class PlayListDetail extends StatefulWidget {
   int id;
   PlayListDetail({Key key, this.id}) : super(key: key);
@@ -14,9 +14,10 @@ class PlayListDetail extends StatefulWidget {
 class _PlayListDetailState extends State<PlayListDetail> {
   Map playList;
   bool hasLoad = false;
+
   getData() async{
     Dio dio = Dio();
-    var res = await dio.get('http://192.168.18.2:3000/playlist/detail?id=' + widget.id.toString());
+    var res = await dio.get(Config().resolveHost() + '/playlist/detail?id=' + widget.id.toString());
     if(res.data['code'] == 200){
        playList = res.data['playlist'];
       setState(() {
@@ -28,9 +29,28 @@ class _PlayListDetailState extends State<PlayListDetail> {
     }
   }
 
+  playSingleSong (id) async {
+    Dio dio = Dio();
+    var res = await dio.get('http://192.168.18.2:3000/song/url?id=' + id.toString());
+    print(res.data);
+    if(res.data['code'] == 200){
+      String songUrl = res.data['data'][0]['url'];
+      print(songUrl);
+      AudioPlayer audioPlayer = AudioPlayer();
+      var pid = await audioPlayer.play(songUrl);
+      if(pid == 1){
+        print('播放成功');
+      }else{
+        print('播放失败');
+      }
+
+    }else{
+      print('获取歌曲失败');
+    }
+  }
+
   @override
   void initState() {
-    
     getData();
     super.initState();
   }
@@ -156,6 +176,10 @@ class _PlayListDetailState extends State<PlayListDetail> {
                                     ),
                                     Container(
                                       child: GestureDetector(
+                                        onTap: () {
+                                          var songId = playList['tracks'].asMap()[key]['id'];
+                                          playSingleSong(songId);
+                                        },
                                         child: Image.asset('images/icon_play_grey.png', width: 20,height: 20,),
                                       ),
                                     )

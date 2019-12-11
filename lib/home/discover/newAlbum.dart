@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
 import '../../widgets/loading.dart';
+import '../../config/index.dart';
 
 class NewAlbum extends StatefulWidget {
   NewAlbum({Key key}) : super(key: key);
@@ -16,7 +17,7 @@ class _NewAlbumState extends State<NewAlbum> {
 
     getData () async{
     Dio dio = Dio();
-    var res = await dio.get('http://192.168.18.2:3000/top/album?offset=0&limit=6');
+    var res = await dio.get(Config().resolveHost() + '/top/album?offset=0&limit=6');
     if(res.data['code'] == 200){
        newAlbumListData = res.data['albums'];
       setState(() {

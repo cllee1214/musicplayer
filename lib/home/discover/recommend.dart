@@ -4,6 +4,8 @@ import 'package:dio/dio.dart';
 import '../../widgets/loading.dart';
 import './playListDetail.dart';
 
+import '../../config/index.dart';
+
 class RecommendList extends StatefulWidget {
   RecommendList({Key key}) : super(key: key);
 
@@ -17,7 +19,9 @@ class _RecommendListState extends State<RecommendList> {
 
   getData () async{
     Dio dio = Dio();
-    var res = await dio.get('http://192.168.18.2:3000/personalized?limit=6');
+    var host = Config().resolveHost();
+    print(host);
+    var res = await dio.get(host + '/personalized?limit=6');
     if(res.data['code'] == 200){
        recommendListData = res.data['result'];
       //  print(recommendListData);
