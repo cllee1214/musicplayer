@@ -1,8 +1,12 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:audioplayers/audioplayers.dart';
 import '../../config/index.dart';
+import './playBar.dart';
+import './playPage.dart';
+
+import '../../events/event_bus.dart';
+
 class PlayListDetail extends StatefulWidget {
   int id;
   PlayListDetail({Key key, this.id}) : super(key: key);
@@ -14,6 +18,7 @@ class PlayListDetail extends StatefulWidget {
 class _PlayListDetailState extends State<PlayListDetail> {
   Map playList;
   bool hasLoad = false;
+  bool hasShowBar = false;
 
   getData() async{
     Dio dio = Dio();
@@ -29,29 +34,32 @@ class _PlayListDetailState extends State<PlayListDetail> {
     }
   }
 
-  playSingleSong (id) async {
-    Dio dio = Dio();
-    var res = await dio.get('http://192.168.18.2:3000/song/url?id=' + id.toString());
-    print(res.data);
-    if(res.data['code'] == 200){
-      String songUrl = res.data['data'][0]['url'];
-      print(songUrl);
-      AudioPlayer audioPlayer = AudioPlayer();
-      var pid = await audioPlayer.play(songUrl);
-      if(pid == 1){
-        print('播放成功');
-      }else{
-        print('播放失败');
-      }
 
+   OverlayEntry creatOverlay(BuildContext context) {
+      return OverlayEntry(
+        builder: (context) => PlayBar()
+      );
+    }
+
+
+  showBottomPlayBar (BuildContext context) {
+    OverlayState overlayState = Overlay.of(context);
+    OverlayEntry overlay;
+    if(hasShowBar){
+      print('has ..');
     }else{
-      print('获取歌曲失败');
+      overlay = creatOverlay(context);
+      overlayState.insert(overlay);
+      hasShowBar = true;
     }
   }
 
   @override
   void initState() {
     getData();
+    Future.delayed(Duration(seconds: 1), (){
+      showBottomPlayBar(context);
+    });
     super.initState();
   }
 
@@ -157,17 +165,19 @@ class _PlayListDetailState extends State<PlayListDetail> {
                                 padding: EdgeInsets.only(top: 10),
                                 child: Row(
                                   children: <Widget>[
-                                    Text(key.toString(), style: TextStyle(color: Colors.grey),),
+                                    Container(
+                                      width: 30,
+                                      child: Text(key.toString(), style: TextStyle(color: Colors.grey))
+                                    ),
+                                    
                                     Expanded(
                                       child: Column(
                                         children: <Widget>[
-                                          Container(
-                                            padding: EdgeInsets.only(left: 20),
+                                          Container(            
                                             width: MediaQuery.of(context).size.width,
                                             child: Text(playList['tracks'].asMap()[key]['name'],textAlign: TextAlign.start,),
                                           ),
                                           Container(
-                                            padding: EdgeInsets.only(left: 20),
                                             width: MediaQuery.of(context).size.width,
                                             child: Text(playList['tracks'].asMap()[key]['ar'][0]['name'] + ' - ' + playList['tracks'].asMap()[key]['al']['name'],style: TextStyle(color: Colors.grey,fontSize: 10)),
                                           )
@@ -178,7 +188,13 @@ class _PlayListDetailState extends State<PlayListDetail> {
                                       child: GestureDetector(
                                         onTap: () {
                                           var songId = playList['tracks'].asMap()[key]['id'];
-                                          playSingleSong(songId);
+                                          var url = playList['tracks'].asMap()[key]['al']['picUrl'];
+                                          var name = playList['tracks'].asMap()[key]['al']['name'];
+                                  
+                                          PlayEvent currentEvent = PlayEvent(songId, url, name);
+                                          eventBus.fire(currentEvent);
+                                          eventBus.fire(PopEvent(0));
+                                      
                                         },
                                         child: Image.asset('images/icon_play_grey.png', width: 20,height: 20,),
                                       ),
