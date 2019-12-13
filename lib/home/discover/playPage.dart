@@ -12,6 +12,7 @@ class PlayPage extends StatefulWidget {
 class _PlayPageState extends State<PlayPage> {
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       home: Scaffold(
         body: Column(
@@ -22,8 +23,7 @@ class _PlayPageState extends State<PlayPage> {
                 children: <Widget>[
                    GestureDetector(
                       onTap: () {
-                        Navigator.pop(context);
-                        // eventBus.fire(PopEvent(0));
+                        eventBus.fire(PopEvent(-1000, 'page'));
                       },
                       child: Image.asset('images/icon_back.png',width: 20,height: 20,),
                     ),

@@ -12,5 +12,6 @@ class PlayEvent {
 
 class PopEvent {
   double p = 0;
-  PopEvent(this.p);
+  String target;
+  PopEvent(this.p, this.target);
 }

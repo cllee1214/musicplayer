@@ -193,7 +193,7 @@ class _PlayListDetailState extends State<PlayListDetail> {
                                   
                                           PlayEvent currentEvent = PlayEvent(songId, url, name);
                                           eventBus.fire(currentEvent);
-                                          eventBus.fire(PopEvent(0));
+                                          eventBus.fire(PopEvent(0, 'bar'));
                                       
                                         },
                                         child: Image.asset('images/icon_play_grey.png', width: 20,height: 20,),
